@@ -1,0 +1,403 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <div>
+            <label>Category Filter</label>
+            <select id="filterCategoty">
+                <option value="'All">ALL</option>
+                <option>Auto</option>
+                <option>Car</option>
+                <option>Truck</option>
+                <option>Bus</option>
+            </select>
+        </div>
+        <div>
+            <label for="filterAvailable">Availabilty Filter</label>
+            <select id="filterAvailable">
+                <option value="All">ALL</option>
+                <option>Available</option>
+                <option>Unavailable</option>
+            </select>
+        </div>
+        <div>
+            <button id="clearFilters">Clear Filter</button>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </header>
+    <div class="wrap">
+        <aside class="sidebar">
+        <h3>Sidebar-fleetform</h3>
+        <form id="fleetform">
+            <label>Reg No of Vehicle
+            <input id="regNo" type="text" required placeholder="e.gKA01AB1234"/>
+            </label>
+            <label>Category
+            <select id="category" required>
+                <option value="">--select category--</option>
+                <option>Auto</option>
+                <option>Car</option>
+                <option>Truck</option>
+                <option>Bus</option>
+                </select>
+            </label>
+            <label>Driver Name
+                <input id="driver" type="text" required placeholder="Driver name">
+            </label>
+            <label style="margin-top: 8px;">
+                <input id="isAvailble" type="checkbox">
+                &nbsp;Is Available
+            </label>
+            <button class="btn" type="submit">Add Fleet</button>
+        </form>
+        <div class="note">
+            <ul>
+                <li>Validates required feilds</li>
+                <li>If valid,appends a vehicle card in the main area</li>
+                <li>Data is saved to local storage</li>
+            </ul>
+        </div>
+        </aside>
+        <main class="main">
+            <h3>Fleet Cards</h3>
+            <div id="cards" class="grid" aria-live="polite"></div>
+
+        </main>
+        </div>
+
+        <script>
+            if(localStorage.getItem("isLoggedIn")!=="true"){
+                alert('please login first')
+                location.href='index.html'
+            }
+            const STOTAGE_KEY="fleets_v1";
+            let fleets=JSON.parse(localStorage.getItem(STORAGE_KEY)|| '[]');
+            const cardsEI=document.getElementById("cards");
+            const form=document.getElementById("fleetForm");
+            function render(){
+                const catFilter=document.getElementById('filterCategory').value;
+                const availFilter=document.getElementById('filterAvailable').value;
+                let toShow=fleets.slice();
+                if(catFilter && catFilter!=="All"){
+                    toShow=toShow.filter(f=>(f.isAvailable?'Available':'Unavailable')===availFilter);
+                                }
+                cardsEI.innerHTML="";
+                toShow.forEach((f,idx)=>{
+                    const el=document.createElement('div');
+                    el.className=card;
+                    el.innerHTML=`
+                    <div class="top">${escapeHtml(f.regNo)}</div>
+                    <div class="small meta"><div>Category:${escapeHtml(f.Category)}
+                    </div><div>Driver:${escapeHtml(f.driver)}</div></div>
+                    <img src=""
+                    `
+                })
+}     
+        </script>
+    
+</body>
+</html> -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mini Fleet - Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    
+    :root { --sidebar-w:220px; --gap:12px; --navbar-h:44px; --accent:#4b83c8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#f4f6f8; color:#222; }
+    
+    .navbar {
+      height:var(--navbar-h);
+      background:var(--accent);
+      color:white;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:6px 10px;
+    }
+    .navbar .left { width:var(--sidebar-w); } /* keep space under navbar for sidebar alignment */
+    .navbar .controls { display:flex; gap:8px; align-items:center; margin-left:8px; }
+    .navbar select, .navbar button { padding:6px 8px; border-radius:4px; border:1px solid rgba(0,0,0,0.1); }
+    .navbar select { background:white; color:#111; }
+    .navbar button { background:#fff; cursor:pointer; }
+
+  
+    .page { display:flex; height:calc(100vh - var(--navbar-h)); }
+    aside.sidebar {
+      width:var(--sidebar-w);
+      padding:10px;
+      background:#fff;
+      border-right:1px solid #e2e6ea;
+      overflow:auto;
+    }
+    main.content {
+      flex:1;
+      padding:14px;
+      overflow:auto;
+    }
+
+    
+    .sidebar h3 { margin:6px 0 8px; font-size:16px; }
+    label { font-size:14px; display:block; margin-top:8px; }
+    input[type="text"], select { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:4px; }
+    .small { font-size:13px; color:#555; margin-top:6px; }
+
+    .btn { margin-top:10px; padding:10px; width:100%; background:var(--accent); color:white; border:none; border-radius:4px; cursor:pointer; }
+
+    
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+    @media (max-width:1000px) { .grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width:600px) { .page { flex-direction:column } .sidebar { width:100%; } .grid { grid-template-columns:1fr; } }
+
+    .card {
+      background:white;
+      padding:10px;
+      border-radius:6px;
+      border:1px solid #e0e6ea;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .card .top { display:flex; justify-content:space-between; font-weight:600; }
+    .meta { font-size:13px; color:#444; display:flex; gap:8px; flex-wrap:wrap; }
+    .actions { display:flex; gap:6px; margin-top:6px; }
+    .actions button { flex:1; padding:8px; border-radius:4px; border:1px solid #cfcfcf; cursor:pointer; background:#fafafa; }
+
+    
+    .main-large {
+      min-height:300px;
+      background:#fff;
+      border:1px dashed #e2e6ea;
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#999;
+      margin-bottom:12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="left"></div>
+    <div style="color:white; font-weight:600;">Mini Fleet - Admin</div>
+
+    <div class="controls" style="margin-left:20px;">
+      <div>
+        <label style="font-size:12px;color:#fff;margin:0 0 4px 0">Category</label>
+        <select id="filterCategory">
+          <option value="All">All</option>
+          <option>Auto</option>
+          <option>Car</option>
+          <option>Truck</option>
+          <option>Bus</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:12px;color:#fff;margin:0 0 4px 0">Availability</label>
+        <select id="filterAvailable">
+          <option value="All">All</option>
+          <option>Available</option>
+          <option>Unavailable</option>
+        </select>
+      </div>
+
+      <button id="clearFilters" title="Clear Filters">Clear Filter</button>
+    </div>
+
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="page">
+   
+    <aside class="sidebar">
+      <h3>Add Fleet</h3>
+      <form id="fleetForm" autocomplete="off">
+        <label>Reg No of Vehicle
+          <input id="regNo" type="text" placeholder="e.g. KA01AB1234" required />
+        </label>
+
+        <label>Select Category
+          <select id="category" required>
+            <option value="">-- Select --</option>
+            <option>Auto</option>
+            <option>Car</option>
+            <option>Truck</option>
+            <option>Bus</option>
+          </select>
+        </label>
+
+        <label>Driver Name
+          <input id="driver" type="text" placeholder="Driver name" required />
+        </label>
+
+        <label>Availability
+          <select id="isAvailableSelect">
+            <option value="true">Available</option>
+            <option value="false">Unavailable</option>
+          </select>
+        </label>
+
+        <button class="btn" type="submit">Add Fleet</button>
+      </form>
+
+      <div class="small">
+        Required fields must be filled. Form clears after add.
+      </div>
+    </aside>
+
+   
+    <main class="content">
+      
+      <div class="main-large">
+        
+        Main Content / Fleet Cards
+      </div>
+
+      <h3 style="margin:8px 0 10px 0;">Fleet Cards</h3>
+      <div id="cards" class="grid" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <script>
+   
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+     
+      alert('Please login first');
+      location.href = 'index.html';
+    }
+
+    const STORAGE_KEY = 'fleets_v1';
+    let fleets = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    const cardsEl = document.getElementById('cards');
+    const form = document.getElementById('fleetForm');
+
+  
+    function render() {
+      const catFilter = document.getElementById('filterCategory').value;
+      const availFilter = document.getElementById('filterAvailable').value;
+      let shown = fleets.slice();
+
+      if (catFilter && catFilter !== 'All') shown = shown.filter(f => f.category === catFilter);
+      if (availFilter && availFilter !== 'All') shown = shown.filter(f => (f.isAvailable ? 'Available' : 'Unavailable') === availFilter);
+
+      cardsEl.innerHTML = '';
+      if (shown.length === 0) {
+        cardsEl.innerHTML = '<div style="grid-column:1/-1; color:#666; padding:12px;">No vehicles found.</div>';
+        return;
+      }
+
+      shown.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const availText = f.isAvailable ? 'Available' : 'Unavailable';
+        const toggleText = f.isAvailable ? 'Make Unavailable' : 'Make Available';
+        const img = f.image || 'https://coding-platform.s3.amazonaws.com/dev/lms/tickets/5e80fcb6-3f8e-480c-945b-30a5359eb40e/JNmYjkVr3WOjsrbu.png';
+
+        card.innerHTML = `
+          <div class="top">
+            <div>${escapeHtml(f.regNo)}</div>
+            <div style="font-size:13px; color:${f.isAvailable ? 'green' : '#b33'}">${availText}</div>
+          </div>
+          <div class="meta"><div><strong>Category:</strong> ${escapeHtml(f.category)}</div><div><strong>Driver:</strong> ${escapeHtml(f.driver)}</div></div>
+          <img src="${img}" alt="vehicle" style="width:100%; height:120px; object-fit:cover; border-radius:4px;" />
+          <div class="actions">
+            <button data-action="update" data-id="${f.id}">Update Driver</button>
+            <button data-action="toggle" data-id="${f.id}">${toggleText}</button>
+            <button data-action="delete" data-id="${f.id}">Delete</button>
+          </div>
+        `;
+        cardsEl.appendChild(card);
+      });
+
+      
+      cardsEl.querySelectorAll('button').forEach(b => b.addEventListener('click', onCardAction));
+    }
+
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return '';
+      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    
+    function onCardAction(e) {
+      const action = e.currentTarget.dataset.action;
+      const id = e.currentTarget.dataset.id;
+      const idx = fleets.findIndex(x => x.id === id);
+      if (idx < 0) return;
+
+      if (action === 'update') {
+        const res = prompt('Enter new driver name', fleets[idx].driver);
+        if (res === null) return;
+        if (res.trim().length === 0) { alert('Driver name cannot be empty'); return; }
+        fleets[idx].driver = res.trim();
+        saveAndRender();
+      } else if (action === 'toggle') {
+        fleets[idx].isAvailable = !fleets[idx].isAvailable;
+        saveAndRender();
+      } else if (action === 'delete') {
+        if (!confirm('Delete this vehicle?')) return;
+        fleets.splice(idx,1);
+        saveAndRender();
+      }
+    }
+
+    function saveAndRender() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fleets));
+      render();
+    }
+
+    // add fleet form
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      const regNo = document.getElementById('regNo').value.trim();
+      const category = document.getElementById('category').value;
+      const driver = document.getElementById('driver').value.trim();
+      const isAvail = document.getElementById('isAvailableSelect').value === 'true';
+
+      if (!regNo || !category || !driver) {
+        alert('Please fill Reg No, Category and Driver');
+        return;
+      }
+
+      const id = Date.now().toString(36) + '-' + Math.floor(Math.random()*10000);
+      fleets.push({ id, regNo, category, driver, isAvailable: isAvail, image: '' });
+      saveAndRender();
+      form.reset();
+      // set default available to Available
+      document.getElementById('isAvailableSelect').value = 'true';
+    });
+
+    // filters and clear
+    document.getElementById('filterCategory').addEventListener('change', render);
+    document.getElementById('filterAvailable').addEventListener('change', render);
+    document.getElementById('clearFilters').addEventListener('click', function(){
+      document.getElementById('filterCategory').value = 'All';
+      document.getElementById('filterAvailable').value = 'All';
+      render();
+    });
+
+    // logout button (clears isLoggedIn flag and go to index)
+    document.getElementById('logoutBtn').addEventListener('click', function(){
+      localStorage.removeItem('isLoggedIn');
+      location.href = 'index.html';
+    });
+
+    // initial render
+    render();
+  </script>
+</body>
+</html>
