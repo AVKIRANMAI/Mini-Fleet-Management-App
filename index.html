@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="card">
+        <h2>Login</h2>
+        <form id="loginform">
+            <label>Email
+                <input id="email" type="email" required autocomplete="username">
+            </label>
+            <label>Password
+                <input id="password" type="password" required autocomplete="current-password">
+            </label>
+            <button type="submit">Login</button>
+        </form>
+        
+    </div>
+    <script>
+        const VALID_EMAIL="admin@gmail.com";
+        const VALID_PASS="admin1234"
+        document.getElementById("loginform").addEventListener('submit',function(e){
+            e.preventDefault();
+            const email=document.getElementById("email").value.trim();
+            const pass=document.getElementById("password").value;
+            if(email===VALID_EMAIL && pass===VALID_PASS){
+                alert("Login Successful")
+                localStorage.setItem("isLoggedIn","true");
+                location.href='admin.html'
+            }
+            else{
+                alert("wrong email or password")
+            }
+        });
+    </script>
+</body>
+</html>
