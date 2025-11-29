@@ -1,107 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <header>
-        <div>
-            <label>Category Filter</label>
-            <select id="filterCategoty">
-                <option value="'All">ALL</option>
-                <option>Auto</option>
-                <option>Car</option>
-                <option>Truck</option>
-                <option>Bus</option>
-            </select>
-        </div>
-        <div>
-            <label for="filterAvailable">Availabilty Filter</label>
-            <select id="filterAvailable">
-                <option value="All">ALL</option>
-                <option>Available</option>
-                <option>Unavailable</option>
-            </select>
-        </div>
-        <div>
-            <button id="clearFilters">Clear Filter</button>
-            <button id="logoutBtn">Logout</button>
-        </div>
-    </header>
-    <div class="wrap">
-        <aside class="sidebar">
-        <h3>Sidebar-fleetform</h3>
-        <form id="fleetform">
-            <label>Reg No of Vehicle
-            <input id="regNo" type="text" required placeholder="e.gKA01AB1234"/>
-            </label>
-            <label>Category
-            <select id="category" required>
-                <option value="">--select category--</option>
-                <option>Auto</option>
-                <option>Car</option>
-                <option>Truck</option>
-                <option>Bus</option>
-                </select>
-            </label>
-            <label>Driver Name
-                <input id="driver" type="text" required placeholder="Driver name">
-            </label>
-            <label style="margin-top: 8px;">
-                <input id="isAvailble" type="checkbox">
-                &nbsp;Is Available
-            </label>
-            <button class="btn" type="submit">Add Fleet</button>
-        </form>
-        <div class="note">
-            <ul>
-                <li>Validates required feilds</li>
-                <li>If valid,appends a vehicle card in the main area</li>
-                <li>Data is saved to local storage</li>
-            </ul>
-        </div>
-        </aside>
-        <main class="main">
-            <h3>Fleet Cards</h3>
-            <div id="cards" class="grid" aria-live="polite"></div>
 
-        </main>
-        </div>
-
-        <script>
-            if(localStorage.getItem("isLoggedIn")!=="true"){
-                alert('please login first')
-                location.href='index.html'
-            }
-            const STOTAGE_KEY="fleets_v1";
-            let fleets=JSON.parse(localStorage.getItem(STORAGE_KEY)|| '[]');
-            const cardsEI=document.getElementById("cards");
-            const form=document.getElementById("fleetForm");
-            function render(){
-                const catFilter=document.getElementById('filterCategory').value;
-                const availFilter=document.getElementById('filterAvailable').value;
-                let toShow=fleets.slice();
-                if(catFilter && catFilter!=="All"){
-                    toShow=toShow.filter(f=>(f.isAvailable?'Available':'Unavailable')===availFilter);
-                                }
-                cardsEI.innerHTML="";
-                toShow.forEach((f,idx)=>{
-                    const el=document.createElement('div');
-                    el.className=card;
-                    el.innerHTML=`
-                    <div class="top">${escapeHtml(f.regNo)}</div>
-                    <div class="small meta"><div>Category:${escapeHtml(f.Category)}
-                    </div><div>Driver:${escapeHtml(f.driver)}</div></div>
-                    <img src=""
-                    `
-                })
-}     
-        </script>
-    
-</body>
-</html> -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -396,7 +293,7 @@
       location.href = 'index.html';
     });
 
-    // initial render
+   
     render();
   </script>
 </body>
